@@ -10,6 +10,7 @@ A port of the popular [tailwind-variants](https://www.tailwind-variants.org/) li
 - Automatic conflict resolution
 - Compound variants
 - Type-safe variants
+- Simple class merging utility
 
 ## Installation
 
@@ -29,7 +30,7 @@ end
 ### Basic Example
 
 ```elixir
-import TailwindVariants, only: [tv: 1, class_list: 2]
+import TailwindVariants, only: [tv: 1, tw: 2]
 
 button = tv(%{
   base: "font-medium bg-blue-500 text-white rounded-full active:opacity-80",
@@ -57,7 +58,7 @@ button = tv(%{
 })
 
 # Use in Phoenix/LiveView
-<button class={class_list(button, %{size: "sm", color: "secondary"})}>
+<button class={tw(button, %{size: "sm", color: "secondary"})}>
   Click me
 </button>
 ```
@@ -67,7 +68,7 @@ button = tv(%{
 Slots allows you to separate a component into multiple parts.
 
 ```elixir
-import TailwindVariants, only: [tv: 1, class_list: 2]
+import TailwindVariants, only: [tv: 1, tw: 2]
 
 card = tv(%{
   slots: %{
@@ -83,8 +84,10 @@ card = tv(%{
 
 # Destructure the slots
 %{base: base, avatar: avatar, wrapper: wrapper, description: description,
-  info_wrapper: info_wrapper, name: name, role: role} = class_list(card, %{})
+  info_wrapper: info_wrapper, name: name, role: role} = tw(card)
+```
 
+```html
 # Use in Phoenix/LiveView
 <figure class={tw(base)}>
   <img class={tw(avatar)} src="/intro-avatar.png" alt="" width="384" height="512" />
@@ -108,7 +111,7 @@ card = tv(%{
 You can also add variants to components with slots.
 
 ```elixir
-import TailwindVariants, only: [tv: 1, class_list: 2]
+import TailwindVariants, only: [tv: 1, tw: 2]
 
 alert = tv(%{
   slots: %{
@@ -174,9 +177,12 @@ alert = tv(%{
   }
 })
 
-%{root: root, message: message, title: title} = class_list(alert, %{severity: "error", variant: "outlined"})
+%{root: root, message: message, title: title} = tw(alert, %{severity: "error", variant: "outlined"})
+```
 
-# Use in Phoenix/LiveView
+Then in your LiveView:
+
+```html
 <div class={tw(root)}>
   <div class={tw(title)}>Oops, something went wrong</div>
   <div class={tw(message)}>
@@ -190,7 +196,7 @@ alert = tv(%{
 You can compose components using the `extend` parameter:
 
 ```elixir
-import TailwindVariants, only: [tv: 1, class_list: 2]
+import TailwindVariants, only: [tv: 1, tw: 2]
 
 base_button = tv(%{
   base: "font-semibold dark:text-white py-1 px-3 rounded-full active:opacity-80 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-800"
@@ -200,11 +206,13 @@ buy_button = tv(%{
   extend: base_button,
   base: "text-sm text-white rounded-lg shadow-lg uppercase tracking-wider bg-blue-500 hover:bg-blue-600 shadow-blue-500/50 dark:bg-blue-500 dark:hover:bg-blue-600"
 })
+```
 
+```html
 # Use in Phoenix/LiveView
 <div class="flex gap-3">
-  <button class={class_list(base_button, %{})}>Button</button>
-  <button class={class_list(buy_button, %{})}>Buy button</button>
+  <button class={tw(base_button)}>Button</button>
+  <button class={tw(buy_button)}>Buy button</button>
 </div>
 ```
 
@@ -213,7 +221,7 @@ buy_button = tv(%{
 You can define styles that apply to specific slots when certain conditions are met:
 
 ```elixir
-import TailwindVariants, only: [tv: 1, class_list: 2]
+import TailwindVariants, only: [tv: 1, tw: 2]
 
 button = tv(%{
   slots: %{
@@ -242,8 +250,10 @@ button = tv(%{
   ]
 })
 
-%{base: base, icon: icon, text: text} = class_list(button, %{size: "lg"})
+%{base: base, icon: icon, text: text} = tw(button, %{size: "lg"})
+```
 
+```html
 # Use in Phoenix/LiveView
 <button class={tw(base)}>
   <svg class={tw(icon)} viewBox="0 0 24 24"><!-- SVG contents --></svg>
@@ -251,24 +261,33 @@ button = tv(%{
 </button>
 ```
 
-## Configuration
+### Class Merging
 
-### TwMerge Configuration
-
-If you need to customize the TwMerge behavior, you can pass a configuration in your component:
+The `tw` function can also be used as a class merging utility:
 
 ```elixir
-button = tv(%{
-  base: "...",
-  config: %{
-    tw_merge: true, # Set to false to disable TwMerge and use simple joining
-  }
-})
+import TailwindVariants, only: [tw: 2]
+
+# Simple class string merging
+tw("bg-red-500", "p-4 bg-blue-500") # => "p-4 bg-blue-500" (blue-500 overrides red-500)
+
+# With conditional classes
+tw(["flex", is_active && "bg-blue-500"]) # => "flex bg-blue-500" (if is_active is true)
+
+# With a class override
+tw("base-classes", %{class: "override-classes"}) # => "base-classes override-classes"
+```
+
+```html
+# In Phoenix templates
+<div class={tw("px-4 py-2", @custom_class)}>
+  Content with merged classes
+</div>
 ```
 
 ## API Reference
 
-### TailwindVariants.tv/1
+### tv/1
 
 Creates a tailwind-variants component:
 
@@ -291,33 +310,80 @@ The `options` argument is a map with the following keys:
 
 #### Return Value
 
-Returns a component that can be used with `class_list/2`.
+Returns a component that can be used with `tw/2`.
 
-### TailwindVariants.class_list/2
+### tw/2
 
-Applies the component with the given props to generate class names:
+A multi-purpose function that works with components and class strings:
 
 ```elixir
-class_list(component, props \\ %{})
+tw(component_or_classes, props_or_more_classes \\ %{})
 ```
 
 #### Parameters
 
+When used with a component:
 - `component`: A component created with `tv/1`
 - `props`: A map of props to apply to the component
 
+When used for class merging:
+- `classes`: A string or list of classes to merge
+- `more_classes`: Additional classes to merge (string, list, or map with `:class` key)
+
 #### Return Value
 
-Returns either:
+When used with a component:
 - A string of class names (if no slots are defined)
 - A map of slot functions (if slots are defined)
 
-### TailwindVariants.tw/2
+When used for class merging:
+- A string of merged class names
 
-An alias for `class_list/2` for shorter code:
+#### Examples
 
 ```elixir
-tw(component, props \\ %{})
+# With a component
+tw(button, %{color: :primary})  # => "base-classes color-variant-classes"
+
+# With a component that has slots
+slots = tw(card, %{variant: "outlined"})
+slots.tw(header)  # => "header-classes outlined-variant-classes"
+
+# For class merging
+tw("text-lg", "font-bold")  # => "text-lg font-bold"
+tw(["flex", is_active && "bg-blue-500"])  # => "flex bg-blue-500" (if is_active is true)
+```
+
+## Configuration
+
+### TwMerge Configuration
+
+If you need to customize the TwMerge behavior, you can pass a configuration in your component:
+
+```elixir
+button = tv(%{
+  base: "...",
+  config: %{
+    tw_merge: true, # Set to false to disable TwMerge and use simple joining
+  }
+})
+```
+
+## Variant Options
+
+To get a list of all available variants and their possible values:
+
+```elixir
+import TailwindVariants, only: [tv: 1, variant_options: 1]
+
+button = tv(%{
+  variants: %{
+    color: %{primary: "", secondary: ""},
+    size: %{sm: "", md: "", lg: ""}
+  }
+})
+
+variant_options(button)  # => %{color: [:primary, :secondary], size: [:sm, :md, :lg]}
 ```
 
 ## Contributing

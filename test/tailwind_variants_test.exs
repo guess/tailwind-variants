@@ -72,23 +72,23 @@ defmodule TailwindVariantsTest do
         })
 
       # Should ignore empty variant
-      secondary_classes = class_list(component, %{color: "secondary"})
+      secondary_classes = tw(component, %{color: "secondary"})
       assert_classes_match("font-medium", secondary_classes)
 
       # Should ignore nil variant
-      sm_classes = class_list(component, %{size: "sm"})
+      sm_classes = tw(component, %{size: "sm"})
       assert_classes_match("font-medium", sm_classes)
 
       # Non-existent variant value
-      nonexistent_classes = class_list(component, %{color: "nonexistent"})
+      nonexistent_classes = tw(component, %{color: "nonexistent"})
       assert_classes_match("font-medium", nonexistent_classes)
     end
   end
 
-  describe "class_list/2 - basic class generation" do
+  describe "tw/2 - basic class generation" do
     test "returns base classes when no variants are provided" do
       component = tv(%{base: "font-medium text-lg"})
-      classes = class_list(component)
+      classes = tw(component)
       assert_classes_match("font-medium text-lg", classes)
     end
 
@@ -104,7 +104,7 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{color: "primary"})
+      classes = tw(component, %{color: "primary"})
       assert_classes_match("font-medium text-blue-500", classes)
     end
 
@@ -123,7 +123,7 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component)
+      classes = tw(component)
       assert_classes_match("font-medium text-blue-500", classes)
     end
 
@@ -142,7 +142,7 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{color: "secondary"})
+      classes = tw(component, %{color: "secondary"})
       assert_classes_match("font-medium text-purple-500", classes)
     end
 
@@ -157,12 +157,12 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{disabled: true})
+      classes = tw(component, %{disabled: true})
       assert_classes_match("font-medium opacity-50 cursor-not-allowed", classes)
     end
   end
 
-  describe "class_list/2 - conflict resolution" do
+  describe "tw/2 - conflict resolution" do
     test "resolves conflicting Tailwind classes using tw_merge" do
       component =
         tv(%{
@@ -174,7 +174,7 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{size: "lg"})
+      classes = tw(component, %{size: "lg"})
       # p-6 should override p-4
       assert_classes_match("text-red-500 p-6 text-lg", classes)
     end
@@ -193,13 +193,13 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{size: "lg"})
+      classes = tw(component, %{size: "lg"})
       # Should just concatenate classes without merging
       assert_classes_match("p-4 text-red-500 p-6 text-lg", classes)
     end
   end
 
-  describe "class_list/2 - compound variants" do
+  describe "tw/2 - compound variants" do
     test "applies compound variants when multiple conditions match" do
       component =
         tv(%{
@@ -223,7 +223,7 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      classes = class_list(component, %{color: "primary", size: "lg"})
+      classes = tw(component, %{color: "primary", size: "lg"})
       assert_classes_match("font-medium text-blue-500 text-lg uppercase tracking-wider", classes)
     end
 
@@ -246,13 +246,13 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      classes_primary = class_list(component, %{color: "primary"})
+      classes_primary = tw(component, %{color: "primary"})
       assert_classes_match("font-medium text-blue-500 rounded-full", classes_primary)
 
-      classes_secondary = class_list(component, %{color: "secondary"})
+      classes_secondary = tw(component, %{color: "secondary"})
       assert_classes_match("font-medium text-purple-500 rounded-full", classes_secondary)
 
-      classes_success = class_list(component, %{color: "success"})
+      classes_success = tw(component, %{color: "success"})
       assert_classes_match("font-medium text-green-500", classes_success)
     end
 
@@ -295,7 +295,7 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      classes = class_list(component, %{color: "primary", size: "sm", rounded: true})
+      classes = tw(component, %{color: "primary", size: "sm", rounded: true})
 
       assert_classes_match(
         "text-blue-500 text-sm rounded-full uppercase tracking-wide font-bold bg-white",
@@ -304,7 +304,7 @@ defmodule TailwindVariantsTest do
     end
   end
 
-  describe "class_list/2 - class overriding" do
+  describe "tw/2 - class overriding" do
     test "allows overriding classes with the class prop" do
       component =
         tv(%{
@@ -317,12 +317,12 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{size: "lg", class: "text-green-500 font-bold"})
+      classes = tw(component, %{size: "lg", class: "text-green-500 font-bold"})
       assert_classes_match("font-bold text-green-500 text-lg", classes)
     end
   end
 
-  describe "class_list/2 - slots" do
+  describe "tw/2 - slots" do
     test "returns a map of slot functions" do
       component =
         tv(%{
@@ -333,15 +333,15 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      slots = class_list(component)
+      slots = tw(component)
       assert is_map(slots)
       assert is_function(slots.base)
       assert is_function(slots.label)
       assert is_function(slots.icon)
 
-      assert_classes_match("flex items-center", class_list(slots.base))
-      assert_classes_match("text-sm font-medium", class_list(slots.label))
-      assert_classes_match("w-5 h-5 mr-2", class_list(slots.icon))
+      assert_classes_match("flex items-center", tw(slots.base))
+      assert_classes_match("text-sm font-medium", tw(slots.label))
+      assert_classes_match("w-5 h-5 mr-2", tw(slots.icon))
     end
 
     test "applies variants to slots" do
@@ -375,10 +375,10 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      slots = class_list(component, %{color: "primary", size: "sm"})
+      slots = tw(component, %{color: "primary", size: "sm"})
 
-      assert_classes_match("rounded bg-blue-500 px-2 py-1", class_list(slots.base))
-      assert_classes_match("font-medium text-white text-sm", class_list(slots.label))
+      assert_classes_match("rounded bg-blue-500 px-2 py-1", tw(slots.base))
+      assert_classes_match("font-medium text-white text-sm", tw(slots.label))
     end
 
     test "applies compound variants to slots" do
@@ -414,16 +414,16 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      slots = class_list(component, %{color: "primary", size: "sm"})
+      slots = tw(component, %{color: "primary", size: "sm"})
 
       assert_classes_match(
         "rounded bg-blue-500 p-2 border-2 border-blue-700",
-        class_list(slots.base)
+        tw(slots.base)
       )
 
       assert_classes_match(
         "font-medium text-white text-sm uppercase tracking-wider",
-        class_list(slots.label)
+        tw(slots.label)
       )
     end
 
@@ -436,7 +436,7 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      slots = class_list(component)
+      slots = tw(component)
       assert_classes_match("flex items-center bg-gray-200", slots.base.(%{class: "bg-gray-200"}))
 
       assert_classes_match(
@@ -461,10 +461,10 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      slots = class_list(component)
-      assert_classes_match("flex", class_list(slots.base))
-      assert_classes_match("p-2 text-blue-500", class_list(slots.item))
-      assert_classes_match("w-4 h-4 text-blue-500", class_list(slots.icon))
+      slots = tw(component)
+      assert_classes_match("flex", tw(slots.base))
+      assert_classes_match("p-2 text-blue-500", tw(slots.item))
+      assert_classes_match("w-4 h-4 text-blue-500", tw(slots.icon))
     end
 
     test "supports compound slots with variants" do
@@ -490,23 +490,23 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      slots = class_list(component, %{color: "primary"})
-      assert_classes_match("p-2 text-blue-500 font-bold", class_list(slots.item))
-      assert_classes_match("w-4 h-4 text-blue-500 font-bold", class_list(slots.icon))
+      slots = tw(component, %{color: "primary"})
+      assert_classes_match("p-2 text-blue-500 font-bold", tw(slots.item))
+      assert_classes_match("w-4 h-4 text-blue-500 font-bold", tw(slots.icon))
 
       # Should not apply when variant doesn't match
-      slots = class_list(component, %{color: "secondary"})
-      assert_classes_match("p-2 text-purple-500", class_list(slots.item))
-      assert_classes_match("w-4 h-4 text-purple-500", class_list(slots.icon))
+      slots = tw(component, %{color: "secondary"})
+      assert_classes_match("p-2 text-purple-500", tw(slots.item))
+      assert_classes_match("w-4 h-4 text-purple-500", tw(slots.icon))
     end
   end
 
-  describe "class_list/2 - extend" do
+  describe "tw/2 - extend" do
     test "merges base classes from extended component" do
       base_component = tv(%{base: "font-medium text-lg"})
       component = tv(%{extend: base_component, base: "text-blue-500 uppercase"})
 
-      classes = class_list(component)
+      classes = tw(component)
       assert_classes_match("font-medium text-lg text-blue-500 uppercase", classes)
     end
 
@@ -533,7 +533,7 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      classes = class_list(component, %{color: "primary", size: "sm"})
+      classes = tw(component, %{color: "primary", size: "sm"})
       assert_classes_match("font-medium text-blue-500 text-sm", classes)
     end
 
@@ -556,10 +556,10 @@ defmodule TailwindVariantsTest do
           }
         })
 
-      slots = class_list(component)
-      assert_classes_match("flex items-center", class_list(slots.base))
-      assert_classes_match("font-medium text-sm", class_list(slots.label))
-      assert_classes_match("w-5 h-5 mr-2", class_list(slots.icon))
+      slots = tw(component)
+      assert_classes_match("flex items-center", tw(slots.base))
+      assert_classes_match("font-medium text-sm", tw(slots.label))
+      assert_classes_match("w-5 h-5 mr-2", tw(slots.icon))
     end
 
     test "merges compound variants from extended component" do
@@ -595,7 +595,7 @@ defmodule TailwindVariantsTest do
           ]
         })
 
-      classes = class_list(component, %{color: "primary", size: "sm"})
+      classes = tw(component, %{color: "primary", size: "sm"})
       assert_classes_match("font-medium text-blue-500 text-sm uppercase tracking-wider", classes)
     end
   end

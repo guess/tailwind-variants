@@ -81,13 +81,6 @@ defmodule TailwindVariants do
     |> Map.new()
   end
 
-  @doc """
-  See `class_list/2`.
-  """
-  def tw(component_or_slot, props \\ %{}) do
-    class_list(component_or_slot, props)
-  end
-
   # Merge base classes from extended component
   defp merge_base(nil, base, _config), do: base
   defp merge_base(%{base: nil}, base, _config), do: base
@@ -164,7 +157,7 @@ defmodule TailwindVariants do
   ## Examples
 
       iex> component = tv(%{base: "font-medium text-white"})
-      iex> class_list(component)
+      iex> tw(component)
       "font-medium text-white"
 
       iex> component = tv(%{
@@ -176,16 +169,22 @@ defmodule TailwindVariants do
       ...>     }
       ...>   }
       ...> })
-      iex> class_list(component, %{color: "primary"})
+      iex> tw(component, %{color: "primary"})
       "font-medium bg-blue-500"
   """
-  def class_list(component_or_slot, props \\ %{})
+  def tw(component_or_slot, props \\ %{})
 
-  def class_list(slot_fn, props) when is_function(slot_fn) do
+  # Slot function map case
+  def tw(slot_fn, props) when is_function(slot_fn, 1) do
     slot_fn.(props)
   end
 
-  def class_list(%Component{} = component, props) do
+  # Direct class merging - string or list of classes
+  def tw(classes, props) when is_list(classes) or is_binary(classes) do
+    Utils.merge_class_names([classes, Map.get(props, :class, "")], %{tw_merge: true})
+  end
+
+  def tw(%Component{} = component, props) do
     if component.slots do
       # Handle components with slots
       generate_slot_functions(component, props)
