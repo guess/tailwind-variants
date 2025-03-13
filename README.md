@@ -179,8 +179,8 @@ alert = tv(%{
 # Use in Phoenix/LiveView
 <div class={tw(root)}>
   <div class={tw(title)}>Oops, something went wrong</div>
-    <div class={tw(message)}>
-      Something went wrong saving your changes. Try again later.
+  <div class={tw(message)}>
+    Something went wrong saving your changes. Try again later.
   </div>
 </div>
 ```
