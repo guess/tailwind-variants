@@ -52,6 +52,37 @@ defmodule TailwindVariantsTest do
       assert is_map(component)
       assert component.default_variants.color == "primary"
     end
+
+    test "handles nil, empty strings, and undefined values gracefully" do
+      component =
+        tv(%{
+          base: "font-medium",
+          variants: %{
+            color: %{
+              primary: "text-blue-500",
+              # Empty variant
+              secondary: ""
+            },
+            size: %{
+              # Nil variant
+              sm: nil,
+              md: "text-base"
+            }
+          }
+        })
+
+      # Should ignore empty variant
+      secondary_classes = class_list(component, %{color: "secondary"})
+      assert_classes_match("font-medium", secondary_classes)
+
+      # Should ignore nil variant
+      sm_classes = class_list(component, %{size: "sm"})
+      assert_classes_match("font-medium", sm_classes)
+
+      # Non-existent variant value
+      nonexistent_classes = class_list(component, %{color: "nonexistent"})
+      assert_classes_match("font-medium", nonexistent_classes)
+    end
   end
 
   describe "class_list/2 - basic class generation" do
@@ -223,6 +254,53 @@ defmodule TailwindVariantsTest do
 
       classes_success = class_list(component, %{color: "success"})
       assert_classes_match("font-medium text-green-500", classes_success)
+    end
+
+    test "handles multiple matching compound variants with correct precedence" do
+      component =
+        tv(%{
+          base: "font-medium",
+          variants: %{
+            color: %{
+              primary: "text-blue-500",
+              secondary: "text-purple-500"
+            },
+            size: %{
+              sm: "text-sm",
+              md: "text-base"
+            },
+            rounded: %{
+              true: "rounded-full",
+              false: "rounded-none"
+            }
+          },
+          compound_variants: [
+            %{
+              color: "primary",
+              class: "uppercase"
+            },
+            %{
+              color: "primary",
+              size: "sm",
+              # Should apply with the previous one
+              class: "tracking-wide bg-black"
+            },
+            %{
+              color: "primary",
+              size: "sm",
+              rounded: true,
+              # Should apply with the previous ones
+              class: "font-bold bg-white"
+            }
+          ]
+        })
+
+      classes = class_list(component, %{color: "primary", size: "sm", rounded: true})
+
+      assert_classes_match(
+        "text-blue-500 text-sm rounded-full uppercase tracking-wide font-bold bg-white",
+        classes
+      )
     end
   end
 
@@ -423,7 +501,7 @@ defmodule TailwindVariantsTest do
     end
   end
 
-  describe "component composition with extend" do
+  describe "class_list/2 - extend" do
     test "merges base classes from extended component" do
       base_component = tv(%{base: "font-medium text-lg"})
       component = tv(%{extend: base_component, base: "text-blue-500 uppercase"})
@@ -519,6 +597,31 @@ defmodule TailwindVariantsTest do
 
       classes = class_list(component, %{color: "primary", size: "sm"})
       assert_classes_match("font-medium text-blue-500 text-sm uppercase tracking-wider", classes)
+    end
+  end
+
+  describe "variant_options/1" do
+    test "returns all available variants" do
+      component =
+        tv(%{
+          variants: %{
+            color: %{
+              primary: "text-blue-500",
+              secondary: "text-purple-500",
+              success: "text-green-500"
+            },
+            size: %{
+              sm: "text-sm",
+              md: "text-base",
+              lg: "text-lg"
+            }
+          }
+        })
+
+      options = variant_options(component)
+      assert is_map(options)
+      assert Enum.sort(options.color) == [:primary, :secondary, :success]
+      assert Enum.sort(options.size) == [:lg, :md, :sm]
     end
   end
 end
