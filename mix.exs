@@ -1,7 +1,7 @@
 defmodule TailwindVariants.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @description "Tailwind Variants for Elixir - A port of the tailwind-variants library"
   @source_url "https://github.com/guess/tailwind-variants"
 
