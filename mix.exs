@@ -50,7 +50,10 @@ defmodule TailwindVariants.MixProject do
       source_url: @source_url,
       extras: [
         "README.md": [title: "Tailwind Variants"]
-      ]
+      ],
+      assets: %{
+        "static/.github" => ".github"
+      }
     ]
   end
 end

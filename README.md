@@ -6,7 +6,7 @@
 </p>
 <p align="center">
   The <em>power</em> of Tailwind combined with a <em>first-class</em> variant API.<br><br>
-  A port of the popular [tailwind-variants](https://www.tailwind-variants.org) library to Elixir,<br>providing a first-class variant API for TailwindCSS in Elixir applications.<br><br>
+  A port of the popular <a href="https://www.tailwind-variants.org">tailwind-variants</a> library to Elixir,<br>providing a first-class variant API for TailwindCSS in Elixir applications.<br><br>
   <a href="https://github.com/guess/tailwind-variants/blob/main/LICENSE">
     <img src="https://img.shields.io/hexpm/l/tailwind_variants.svg" alt="license">
   </a>
