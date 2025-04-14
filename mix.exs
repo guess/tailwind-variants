@@ -46,9 +46,11 @@ defmodule TailwindVariants.MixProject do
 
   defp docs do
     [
-      main: "TailwindVariants",
+      main: "readme",
       source_url: @source_url,
-      extras: ["README.md"]
+      extras: [
+        "README.md": [title: "Tailwind Variants"]
+      ]
     ]
   end
 end
