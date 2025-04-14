@@ -51,9 +51,8 @@ defmodule TailwindVariants.MixProject do
       extras: [
         "README.md": [title: "Tailwind Variants"]
       ],
-      assets: %{
-        "static/.github" => ".github"
-      }
+      assets: "assets",
+      logo: ".github/assets/cover.png"
     ]
   end
 end

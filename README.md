@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://hexdocs.pm/tailwind_variants">
-    <img width="25%" src=".github/assets/cover.png" alt="tailwind-variants" />
+    <img width="25%" src="assets/cover.png" alt="tailwind-variants" />
     <h1 align="center">tailwind-variants</h1>
   </a>
 </p>
