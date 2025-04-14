@@ -1,6 +1,14 @@
-# Tailwind Variants for Elixir
-
-A port of the popular [tailwind-variants](https://www.tailwind-variants.org/) library to Elixir, providing a first-class variant API for TailwindCSS in Elixir applications.
+<p align="center">
+  <img width="25%" src=".github/assets/cover.png" alt="tailwind-variants" />
+  <h1 align="center">tailwind-variants</h1>
+</p>
+<p align="center">
+  The <em>power</em> of Tailwind combined with a <em>first-class</em> variant API.<br><br>
+  A port of the popular [tailwind-variants](https://www.tailwind-variants.org) library to Elixir,<br>providing a first-class variant API for TailwindCSS in Elixir applications.<br><br>
+  [![License](https://img.shields.io/hexpm/l/tailwind_variants.svg)](https://github.com/guess/tailwind-variants/blob/main/LICENSE)
+  [![Version](https://img.shields.io/hexpm/v/tailwind_variants.svg)](https://hex.pm/packages/tailwind_variants)
+  [![Hex Docs](https://img.shields.io/badge/documentation-gray.svg)](https://hexdocs.pm/tailwind_variants)
+</p> 
 
 ## Features
 
